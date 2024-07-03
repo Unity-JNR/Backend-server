@@ -20,6 +20,13 @@ const io = new Server(server, {
     credentials: true
   }
 });
+
+app.use((req, res, next) => {
+  res.header("Access-Control-Allow-Origin", "*"); // For development, replace '*' with 'http://localhost:8080' for production
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+});
+
 app.get('/api/messages', async (req, res) => {
   try {
     const [rows] = await pool.query('SELECT * FROM messages');
