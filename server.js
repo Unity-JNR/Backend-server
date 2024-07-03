@@ -9,10 +9,17 @@ config();
 
 const app = express();
 const server = createServer(app);
-const io = new Server(server,cors({ origin: 'http://localhost:8080',
-  credentials: true
- }));
+app.use(cors({ origin: 'http://localhost:8080', credentials: true }));
 
+// Initialize Socket.IO with CORS
+const io = new Server(server, {
+  cors: {
+    origin: 'http://localhost:8080',
+    methods: ['GET', 'POST'],
+    allowedHeaders: ['my-custom-header'],
+    credentials: true
+  }
+});
 app.get('/api/messages', async (req, res) => {
   try {
     const [rows] = await pool.query('SELECT * FROM messages');
