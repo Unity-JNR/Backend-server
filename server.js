@@ -10,7 +10,12 @@ config();
 
 const app = express();
 const server = createServer(app);
-app.use(cors({ origin: 'http://localhost:8080', credentials: true }));
+app.use(cors({
+  origin: 'http://localhost:8080', // Replace with your frontend URL
+  methods: ['GET', 'POST'],
+  allowedHeaders: ['my-custom-header'],
+  credentials: true
+}));
 
 const io = new Server(server, {
   cors: {
