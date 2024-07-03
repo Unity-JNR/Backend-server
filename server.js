@@ -11,6 +11,16 @@ const app = express();
 const server = createServer(app);
 const io = new Server(server, cors());
 
+app.get('/api/messages', async (req, res) => {
+  try {
+    const [rows] = await pool.query('SELECT * FROM messages');
+    res.json(rows);
+  } catch (error) {
+    console.error('Error fetching messages:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});
+
 const pool = mysql.createPool({
     host: process.env.HOST,
     user: process.env.USER,
