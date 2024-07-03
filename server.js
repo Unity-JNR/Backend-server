@@ -10,10 +10,12 @@ config();
 
 const app = express();
 const server = createServer(app);
+
+// Correctly apply CORS middleware globally
 app.use(cors({
-  origin: 'http://localhost:8080', // Replace with your frontend URL
+  origin: 'http://localhost:8080', // Adjust this to your frontend URL
   methods: ['GET', 'POST'],
-  allowedHeaders: ['my-custom-header'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'my-custom-header'], // Include relevant headers
   credentials: true
 }));
 
@@ -21,12 +23,11 @@ const io = new Server(server, {
   cors: {
     origin: 'http://localhost:8080',
     methods: ['GET', 'POST'],
-    allowedHeaders: ['my-custom-header'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'my-custom-header'], // Match the allowed headers with the Express CORS settings
     credentials: true
   },
   path: '/chat' // Specify the namespace
 });
-
 
 // Initialize MySQL connection pool
 const pool = mysql.createPool({
