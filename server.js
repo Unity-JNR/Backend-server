@@ -23,8 +23,10 @@ const io = new Server(server, {
     methods: ['GET', 'POST'],
     allowedHeaders: ['my-custom-header'],
     credentials: true
-  }
+  },
+  path: '/chat' // Specify the namespace
 });
+
 
 // Initialize MySQL connection pool
 const pool = mysql.createPool({
