@@ -11,11 +11,10 @@ config();
 const app = express();
 const server = createServer(app);
 
-// Correctly apply CORS middleware globally
 app.use(cors({
-  origin: 'http://localhost:8080', // Adjust this to your frontend URL
+  origin: 'http://localhost:8080',
   methods: ['GET', 'POST'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'my-custom-header'], // Include relevant headers
+  allowedHeaders: ['Content-Type', 'Authorization', 'my-custom-header'],
   credentials: true
 }));
 
@@ -23,13 +22,12 @@ const io = new Server(server, {
   cors: {
     origin: 'http://localhost:8080',
     methods: ['GET', 'POST'],
-    allowedHeaders: ['Content-Type', 'Authorization', 'my-custom-header'], // Match the allowed headers with the Express CORS settings
+    allowedHeaders: ['Content-Type', 'Authorization', 'my-custom-header'],
     credentials: true
   },
-  path: '/chat' // Specify the namespace
+  path: '/chat'
 });
 
-// Initialize MySQL connection pool
 const pool = mysql.createPool({
     host: process.env.HOST,
     user: process.env.USER,
@@ -40,23 +38,20 @@ const pool = mysql.createPool({
 io.on('connection', async (socket) => {
   console.log('New connection');
 
-  // Generate a unique user ID using UUIDv4
   let userId = uuidv4();
+  socket.id = userId; // Assign the generated UUID as the socket's id
 
-  // Emit the unique ID to the client
   socket.emit('userId', userId);
 
-  // Listen for chat messages
-  socket.on('chat message', async ({ content, userId }) => {
+  socket.on('chat message', async ({ content }) => {
     try {
-      await pool.query('INSERT INTO messages (content, user_id) VALUES (?,?)', [content, userId]);
-      io.emit('chat message', { content, userId }); // Broadcast the message
+      await pool.query('INSERT INTO messages (content) VALUES (?)', [content]);
+      io.to(socket.id).emit('chat message', { content }); // Directly emit to the sender
     } catch (error) {
       console.error('Error saving message:', error);
     }
   });
 
-  // Handle disconnection
   socket.on('disconnect', () => {
     console.log('User disconnected');
   });
