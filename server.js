@@ -35,18 +35,16 @@ const pool = mysql.createPool({
     database: process.env.DATABASE
 }).promise();
 
-io.on('connection', async (socket) => {
+io.on('connection', (socket) => {
   console.log('New connection');
 
   let userId = uuidv4();
-  socket.id = userId; // Assign the generated UUID as the socket's id
-
   socket.emit('userId', userId);
 
   socket.on('chat message', async ({ content }) => {
     try {
       await pool.query('INSERT INTO messages (content) VALUES (?)', [content]);
-      io.to(socket.id).emit('chat message', { content }); // Directly emit to the sender
+      io.emit('chat message', { content }); // Emit to all connected clients
     } catch (error) {
       console.error('Error saving message:', error);
     }
