@@ -43,7 +43,7 @@ io.on('connection', (socket) => {
 
   socket.on('chat message', async ({ content }) => {
     try {
-      await pool.query('INSERT INTO messages (content) VALUES (?)', [content]);
+      await pool.query('INSERT INTO messages (content, user_id) VALUES (?, ?)', [content, userId]);
       io.emit('chat message', { content }); // Emit to all connected clients
     } catch (error) {
       console.error('Error saving message:', error);
