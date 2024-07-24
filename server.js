@@ -44,7 +44,7 @@ io.on('connection', (socket) => {
   socket.on('chat message', async ({ content }) => {
     try {
       await pool.query('INSERT INTO messages (content, user_id) VALUES (?, ?)', [content, userId]);
-      io.emit('chat message', { content,userId}); // Emit to all connected clients
+      io.emit('chat message', { content, userId }); // Emit to all connected clients
     } catch (error) {
       console.error('Error saving message:', error);
     }
@@ -54,6 +54,19 @@ io.on('connection', (socket) => {
     console.log('User disconnected');
   });
 });
+
+// Function to truncate the messages table
+const truncateMessagesTable = async () => {
+  try {
+    await pool.query('TRUNCATE TABLE messages');
+    console.log('Messages table truncated');
+  } catch (error) {
+    console.error('Error truncating messages table:', error);
+  }
+};
+
+// Set interval to truncate the messages table every 2 hours (2 hours = 7200000 milliseconds)
+setInterval(truncateMessagesTable, 7200000);
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => console.log(`Listening on port ${PORT}`));
