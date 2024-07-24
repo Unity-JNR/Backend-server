@@ -58,12 +58,20 @@ io.on('connection', (socket) => {
 // Function to truncate the messages table
 const truncateMessagesTable = async () => {
   try {
-    await pool.query('TRUNCATE TABLE messages');
-    console.log('Messages table truncated');
+    const [rows] = await pool.query('SELECT COUNT(*) AS count FROM messages');
+    const count = rows[0].count;
+
+    if (count > 0) {
+      await pool.query('TRUNCATE TABLE messages');
+      console.log('Messages table truncated');
+    } else {
+      console.log('Messages table is already empty');
+    }
   } catch (error) {
     console.error('Error truncating messages table:', error);
   }
 };
+
 
 // Set interval to truncate the messages table every 2 hours (2 hours = 7200000 milliseconds)
 setInterval(truncateMessagesTable, 7200000);
