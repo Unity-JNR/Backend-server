@@ -12,7 +12,7 @@ const app = express();
 const server = createServer(app);
 
 app.use(cors({
-  origin: 'http://localhost:8080',
+  origin: 'https://chat-sable-nu.vercel.app/',
   methods: ['GET', 'POST'],
   allowedHeaders: ['Content-Type', 'Authorization', 'my-custom-header'],
   credentials: true
@@ -20,7 +20,7 @@ app.use(cors({
 
 const io = new Server(server, {
   cors: {
-    origin: 'http://localhost:8080',
+    origin: 'https://chat-sable-nu.vercel.app/',
     methods: ['GET', 'POST'],
     allowedHeaders: ['Content-Type', 'Authorization', 'my-custom-header'],
     credentials: true
