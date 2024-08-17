@@ -35,29 +35,11 @@ const pool = mysql.createPool({
     database: process.env.DATABASE
 }).promise();
 
-const fetchTodaysMessages = async () => {
-  try {
-    const [rows] = await pool.query(`
-      SELECT content, user_id 
-      FROM messages 
-      WHERE DATE(created_at) = CURDATE()
-    `);
-    return rows;
-  } catch (error) {
-    console.error('Error fetching today\'s messages:', error);
-    return [];
-  }
-};
-
-io.on('connection', async (socket) => {
+io.on('connection', (socket) => {
   console.log('New connection');
 
   let userId = uuidv4();
   socket.emit('userId', userId);
-
-  // Fetch and send today's messages to the new user
-  const todaysMessages = await fetchTodaysMessages();
-  socket.emit('previous messages', todaysMessages);
 
   socket.on('chat message', async ({ content }) => {
     try {
@@ -89,6 +71,7 @@ const truncateMessagesTable = async () => {
     console.error('Error truncating messages table:', error);
   }
 };
+
 
 // Set interval to truncate the messages table every 2 hours (2 hours = 7200000 milliseconds)
 setInterval(truncateMessagesTable, 7200000);
